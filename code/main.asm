@@ -21,7 +21,7 @@ Start:
 	clrf	ANSEL		; Configura a PORTA como entrada digital
 	
 Main:
-	goto	Rotina_Inicializacao
+	call	Rotina_Inicializacao
 	
 Rotina_Inicializacao:
 	bcf		STATUS,RP1		;indo para o banco0
@@ -30,9 +30,43 @@ Rotina_Inicializacao:
 	movwf	PORTA			;ligando os leds
 	call 	Delay_1s		;chama função de delay
 	clrf	PORTA			;apaga todos os leds
+	clrf 	led_cnt			;led_cnt=0
 	
+LedCountLoop:
+	clrf	PORTA			;apaga todos os leds
+	clrf 	led_cnt			;led_cnt=0
+	movlw   .0
+	subwf	led_cnt , W
+	btfsc	STATUS  , Z 	;led_cnt=0?
+	bsf		PORTA   , RA0	;sim
 	
+	movlw   .1
+	subwf	led_cnt , W
+	btfsc	STATUS  , Z 	;led_cnt=0?
+	bsf		PORTA   , RA0	;sim
 	
+	movlw   .2
+	subwf	led_cnt , W
+	btfsc	STATUS  , Z 	;led_cnt=0?
+	bsf		PORTA   , RA0	;sim
+	
+	movlw   .3
+	subwf	led_cnt , W
+	btfsc	STATUS  , Z 	;led_cnt=0?
+	bsf		PORTA   , RA0	;sim
+	call 	Delay_200ms
+	incf	led_cnt , F		;
+	
+	movlw 	.4
+	subwf	led_cnt , W					
+	btfss	status  , Z 	;led_cnt=4?
+	goto   	LedCountLoop	;não
+	clrf 	PORTA			;sim
+	
+	return
+	
+
+				
 	
 	
 		
