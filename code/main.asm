@@ -1,4 +1,4 @@
-#include <pic26f887.inc>
+#include <p16f887.inc>
 list p=16f887
 
 	cblock	0x20 	;dando um nome para um endereço de memoria
@@ -22,6 +22,7 @@ Start:
 	
 Main:
 	call	Rotina_Inicializacao
+	goto 	Main
 	
 Rotina_Inicializacao:
 	bcf		STATUS,RP1		;indo para o banco0
@@ -59,12 +60,20 @@ LedCountLoop:
 	
 	movlw 	.4
 	subwf	led_cnt , W					
-	btfss	status  , Z 	;led_cnt=4?
+	btfss	STATUS  , Z 	;led_cnt=4?
 	goto   	LedCountLoop	;não
 	clrf 	PORTA			;sim
 	
 	return
 	
+Delay_1s:
+	nop
+	return
+Delay_200ms:
+	nop
+	return
+end
+
 
 				
 	
