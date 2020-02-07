@@ -3,6 +3,8 @@ list p=16f887
 
 	cblock	0x20 	;dando um nome para um endereço de memoria
 		led_cnt
+		cnt_1
+		cnt_2
 	endc
 
 	org		0x00 	;vetor de inicialização
@@ -30,12 +32,10 @@ Rotina_Inicializacao:
 	movlw	0x0F			;movendo b'00001111' 
 	movwf	PORTA			;ligando os leds
 	call 	Delay_1s		;chama função de delay
-	clrf	PORTA			;apaga todos os leds
 	clrf 	led_cnt			;led_cnt=0
 	
 LedCountLoop:
 	clrf	PORTA			;apaga todos os leds
-	clrf 	led_cnt			;led_cnt=0
 	movlw   .0
 	subwf	led_cnt , W
 	btfsc	STATUS  , Z 	;led_cnt=0?
@@ -44,17 +44,17 @@ LedCountLoop:
 	movlw   .1
 	subwf	led_cnt , W
 	btfsc	STATUS  , Z 	;led_cnt=0?
-	bsf		PORTA   , RA0	;sim
+	bsf		PORTA   , RA1	;sim
 	
 	movlw   .2
 	subwf	led_cnt , W
 	btfsc	STATUS  , Z 	;led_cnt=0?
-	bsf		PORTA   , RA0	;sim
+	bsf		PORTA   , RA2	;sim
 	
 	movlw   .3
 	subwf	led_cnt , W
 	btfsc	STATUS  , Z 	;led_cnt=0?
-	bsf		PORTA   , RA0	;sim
+	bsf		PORTA   , RA3	;sim
 	call 	Delay_200ms
 	incf	led_cnt , F		;
 	
@@ -67,11 +67,32 @@ LedCountLoop:
 	return
 	
 Delay_1s:
-	nop
+	call	Delay_200ms
+	call	Delay_200ms
+	call	Delay_200ms
+	call	Delay_200ms
+	call	Delay_200ms
 	return
-Delay_200ms:
+
+Delay_1ms:
+	movlw	.248
+	movwf	cnt_1
+Delay1:	
 	nop
+	decfsz	cnt_1,F			;decrementado cnt_1
+	goto Delay1
+							;cnt =0 
 	return
+
+Delay_200ms
+	movlw	.200
+	movwf	cnt_2
+Delay_2
+	call	Delay_1ms
+	decfsz	cnt_2,F
+	goto	Delay_2
+	return
+	
 end
 
 
