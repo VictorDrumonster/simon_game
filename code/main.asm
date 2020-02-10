@@ -2,15 +2,27 @@
 list p=16f887
 __CONFIG _CONFIG1, 	0x2ff4
 __CONFIG _CONFIG2,	0x3FFF
+
+#define button	PORTB,RB0
 	cblock	0x20 	;dando um nome para um endereço de memoria
 		led_cnt
 		cnt_1
 		cnt_2
 		_wreg
 		_status
-		timer_counter
+		timer_counter_5s
+		timer_counter_50ms
+		level		;0 	hard
+					;1	easy
+		sequency
+		move
 	endc
-	TMR0_50ms	EQU	.61
+	TMR0_50ms	EQU		.61
+	LED_RED		EQU 	b'00000001'
+	LED_YELLOW	EQU		b'00000010'
+	LED_GREEN	EQU		b'00000100'
+	LED_BLUE	EQU		b'00001000'
+	
 	org		0x00 	;vetor de inicialização
 	goto	Start
 	
@@ -25,7 +37,8 @@ __CONFIG _CONFIG2,	0x3FFF
 	
 Timer0Interrupt:
 	bcf		INTCON,T0IF;
-	incf	timer_counter
+	incf	timer_counter_5s,F
+	incf	timer_counter_50ms,F
 	movlw 	TMR0_50ms
 	movwf	TMR0
 	goto	ExitInterrupt
@@ -39,11 +52,16 @@ ExitInterrupt:
 	retfie	
 Start:
 	;--- I/O config ----
+	clrf	timer_counter_5s
+	clrf	timer_counter_50ms
 	bsf		STATUS,RP0 	;seleciona o banco1
 	movlw	B'11110000'
 	movwf	TRISA		;configurar RA0-RA3 como saida
 						;e RA3-RA4 como entrada
+	bcf		TRISB,TRISB0	;configurando RB0 como entrada - start
+	bcf		TRISB,TRISB1	;configurando RB1 como entrada - level
 	bsf		STATUS,RP1
+	clrf	ANSELH
 	clrf	ANSEL		; Configura a PORTA como entrada digital
 	
 ;-------Configuração do TIMER0 --------
@@ -63,10 +81,59 @@ Start:
 	bcf		INTCON,T0IF		;limpando a Flag
 	bsf		INTCON,T0IE		;abilitando interrupçãp de TMRO
 	bsf		INTCON,GIE		;abilitando interrupções
-Main:
 	call	Rotina_Inicializacao
-	goto 	Main
+Main:
+	btfsc	button		;botão start pressionado
+	goto	Main
+	movf	TMR0,W
+	movwf	move		;copia TMR0 para move
+	clrf	sequency	;sequencia igual a zero
+	btfsc	PORTB,RB1	;seleção de level
+	goto	LevelEasy
 	
+	goto	LevelHard
+
+LevelEasy:
+	bcf level,0
+	goto	Main_Loop
+
+
+LevelHard:
+	bsf level,0
+	goto	Main_Loop
+
+Main_Loop:
+	call SorteiaNumero
+	goto Main
+
+;--------------
+;Recebe move
+SorteiaNumero:
+
+	movlw	0x03
+	andwf	move			;clear bits <7:2>
+
+	movlw	.0
+	subwf	move, W
+	btfsc	STATUS,Z
+	retlw	LED_RED
+	
+	movlw	.1
+	subwf	move, W
+	btfsc	STATUS,Z
+	retlw	LED_YELLOW
+
+	movlw	.2
+	subwf	move, W
+	btfsc	STATUS,Z
+	retlw	LED_GREEN
+	
+	movlw	.3
+	subwf	move, W
+	btfsc	STATUS,Z
+	retlw	LED_BLUE
+
+
 Rotina_Inicializacao:
 	bcf		STATUS,RP1		;indo para o banco0
 	bcf		STATUS,RP0
