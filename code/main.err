@@ -1,4 +1,10 @@
 Warning[205] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 2 : Found directive in column 1. (list)
-Message[302] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 20 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 23 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Warning[205] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 96 : Found directive in column 1. (end)
+Warning[205] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 3 : Found directive in column 1. (__CONFIG)
+Warning[205] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 4 : Found directive in column 1. (__CONFIG)
+Warning[207] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 13 : Found label after column 1. (TMR0_50ms)
+Message[305] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 28 : Using default destination of 1 (file).
+Message[302] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 44 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 47 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 57 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 59 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Warning[205] C:\USERS\ALUNO\DESKTOP\PORTABLEGIT\ECAI11_ADD\SIMON_GAME\SIMON_GAME\CODE\MAIN.ASM 137 : Found directive in column 1. (end)

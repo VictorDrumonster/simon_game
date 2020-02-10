@@ -1,18 +1,42 @@
 #include <p16f887.inc>
 list p=16f887
-
+__CONFIG _CONFIG1, 	0x2ff4
+__CONFIG _CONFIG2,	0x3FFF
 	cblock	0x20 	;dando um nome para um endereço de memoria
 		led_cnt
 		cnt_1
 		cnt_2
+		_wreg
+		_status
+		timer_counter
 	endc
-
+	TMR0_50ms	EQU	.61
 	org		0x00 	;vetor de inicialização
 	goto	Start
 	
 	org		0x04	;vetor de interrupção
-	retfie
+	movwf	_wreg
+	swapf	STATUS, W
+	movwf 	_status
+	clrf	STATUS
+	btfsc	INTCON,T0IF			;T0IF==1?
+	goto	Timer0Interrupt		;yes
+	goto	ExitInterrupt		;no
 	
+Timer0Interrupt:
+	bcf		INTCON,T0IF;
+	incf	timer_counter
+	movlw 	TMR0_50ms
+	movwf	TMR0
+	goto	ExitInterrupt
+	
+ExitInterrupt:
+	swapf	_status,W
+	movwf	STATUS
+	swapf	_wreg,F
+	swapf	_wreg,W
+	
+	retfie	
 Start:
 	;--- I/O config ----
 	bsf		STATUS,RP0 	;seleciona o banco1
@@ -22,6 +46,23 @@ Start:
 	bsf		STATUS,RP1
 	clrf	ANSEL		; Configura a PORTA como entrada digital
 	
+;-------Configuração do TIMER0 --------
+;INTCON,TMR0,OPTION_REG
+;OPTION_REG: 
+;TOCS=0 (INTOSC/4)
+;PSA= 0 (PRESCALER TMR0)
+;PS=111
+	bcf		STATUS,RP1		;indo para o bank1		
+	movlw 	b'00000111'		;
+	iorwf 	OPTION_REG,F	;setando PSA<2:0>
+	movlw 	b'11010111' 	;
+	andwf 	OPTION_REG,F	;clear TOCS, PSA 
+	bcf		STATUS,RP0		;INDO PARA O BANK 0	
+	movlw 	.61
+	movwf	TMR0
+	bcf		INTCON,T0IF		;limpando a Flag
+	bsf		INTCON,T0IE		;abilitando interrupçãp de TMRO
+	bsf		INTCON,GIE		;abilitando interrupções
 Main:
 	call	Rotina_Inicializacao
 	goto 	Main
