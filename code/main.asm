@@ -17,11 +17,12 @@ __CONFIG _CONFIG2,	0x3FFF
 		sequency
 		move
 	endc
-	TMR0_50ms	EQU		.61
-	LED_RED		EQU 	b'00000001'
-	LED_YELLOW	EQU		b'00000010'
-	LED_GREEN	EQU		b'00000100'
-	LED_BLUE	EQU		b'00001000'
+	MOVE_BASE_ADD	EQU		0x5F
+	TMR0_50ms		EQU		.61
+	LED_RED			EQU 	b'00000001'
+	LED_YELLOW		EQU		b'00000010'
+	LED_GREEN		EQU		b'00000100'
+	LED_BLUE		EQU		b'00001000'
 	
 	org		0x00 	;vetor de inicialização
 	goto	Start
@@ -82,9 +83,16 @@ Start:
 	bsf		INTCON,T0IE		;abilitando interrupçãp de TMRO
 	bsf		INTCON,GIE		;abilitando interrupções
 	call	Rotina_Inicializacao
+	
+	movlw	MOVE_BASE_ADD
+	movwf	FSR
+	bcf		STATUS,IRP
+
 Main:
 	btfsc	button		;botão start pressionado
 	goto	Main
+	
+	
 	movf	TMR0,W
 	movwf	move		;copia TMR0 para move
 	clrf	sequency	;sequencia igual a zero
@@ -94,16 +102,17 @@ Main:
 	goto	LevelHard
 
 LevelEasy:
-	bcf level,0
+	bcf 	level,0
 	goto	Main_Loop
 
 
 LevelHard:
-	bsf level,0
+	bsf 	level,0
 	goto	Main_Loop
 
 Main_Loop:
-	call SorteiaNumero
+	call	SorteiaNumero
+	call	StoreNumber
 	goto Main
 
 ;--------------
@@ -133,6 +142,10 @@ SorteiaNumero:
 	btfsc	STATUS,Z
 	retlw	LED_BLUE
 
+StoreNumber:
+	movwf	INDF
+	incf	FSR
+	return
 
 Rotina_Inicializacao:
 	bcf		STATUS,RP1		;indo para o banco0
