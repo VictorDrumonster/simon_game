@@ -16,7 +16,14 @@ __CONFIG _CONFIG2,	0x3FFF
 					;1	easy
 		sequency
 		move
+		last_move
+		last_input
+		timeout		;0
+					;1
+		current_move
 	endc
+	HARD_TIMEOUT	EQU		.3
+	EASY_TIMEOUT	EQU		.5
 	MOVE_BASE_ADD	EQU		0x5F
 	TMR0_50ms		EQU		.61
 	LED_RED			EQU 	b'00000001'
@@ -61,6 +68,9 @@ Start:
 						;e RA3-RA4 como entrada
 	bcf		TRISB,TRISB0	;configurando RB0 como entrada - start
 	bcf		TRISB,TRISB1	;configurando RB1 como entrada - level
+	
+	clrf 	TRISD			;dodos os pinos como entrada
+	
 	bsf		STATUS,RP1
 	clrf	ANSELH
 	clrf	ANSEL		; Configura a PORTA como entrada digital
@@ -144,9 +154,52 @@ SorteiaNumero:
 
 StoreNumber:
 	movwf	INDF
-	incf	FSR
+	incf	FSR,F
+	incf	last_move,F
 	return
+Entrada_de_movimento
+	bcf		STATUS,RP0
+	bcf		STATUS,RP1		;bank0
+	clrf	last_input
+	movlw	MOVE_BASE_ADD
+	movwf	FSR				;
+InputLoop
+	movf	PORTD,W
+	andlw	0x0FF			;limpado RD <7:4>
+	sublw	0x00
+	btfss	STATUS,Z		;Testando entradas
+	goto	ButtonNotPressed
+	goto	ButtonPressed
 
+ButtonNotPressed:
+	btfss	timeout,0			;ocorreu timeout
+	goto	InputLoop		;não
+	return
+ButtonPressed:
+	movwf current_move
+	call CompareInput
+	sublw	.0
+	btfsc	STATUS,Z		;botão correto pressionado?
+	return					;não
+	
+	incf	last_input
+	incf	FSR,F
+	
+	movf	last_input,W
+	subwf	last_move,W
+	btfsc	STATUS,C		;last_input>last_move
+	return
+	goto	InputLoop
+
+CompareInput:
+	movf	current_move
+	subwf	INDF,W
+	btfss	STATUS,Z
+	retlw	.0				;botao errado
+
+	retlw	current_move
+	
+			
 Rotina_Inicializacao:
 	bcf		STATUS,RP1		;indo para o banco0
 	bcf		STATUS,RP0
